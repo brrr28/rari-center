@@ -3,7 +3,7 @@ import type { BookingResponse, Slot } from "../api/calendly";
 import {
   getFromQuery,
   getPsyIdFromQuery,
-  isoUtcNow,
+  isoUtcNowPlus4hours,
   isoUtcPlusDays,
 } from "../shared/date";
 
@@ -13,7 +13,7 @@ const PSY_AUTH: Array<{ id: string; token: string }> = [
   {
     id: "123",
     token:
-      "eyJraWQiOiIxY2UxZTEzNjE3ZGNmNzY2YjNjZWJjY2Y4ZGM1YmFmYThhNjVlNjg0MDIzZjdjMzJiZTgzNDliMjM4MDEzNWI0IiwidHlwIjoiUEFUIiwiYWxnIjoiRVMyNTYifQ",
+      "eyJraWQiOiIxY2UxZTEzNjE3ZGNmNzY2YjNjZWJjY2Y4ZGM1YmFmYThhNjVlNjg0MDIzZjdjMzJiZTgzNDliMjM4MDEzNWI0IiwidHlwIjoiUEFUIiwiYWxnIjoiRVMyNTYifQ.eyJpc3MiOiJodHRwczovL2F1dGguY2FsZW5kbHkuY29tIiwiaWF0IjoxNzY1MjExNDMzLCJqdGkiOiIwYmVhNGZiNi1kYWRkLTRlZDctYjM3Yy0yOTcxYTRjMzlhMjYiLCJ1c2VyX3V1aWQiOiJiMThjMjRmNS1jOTZmLTQxMTUtODYwYy0zMzNmZjFhZTM2ZDMifQ.c37YFA-V55adRe4iytK5to_enZGtCGXF11Bzp5_PSttbo-nMwjepQzcWx2-oFTQ3G57c9hWMsAKNofIw0iubtQ",
   },
   // { id: "124", token: "PASTE_TOKEN_HERE" },
 ];
@@ -186,8 +186,8 @@ export function App() {
           );
         }
 
-        const from_utc = isoUtcNow();
-        const to_utc = isoUtcPlusDays(14);
+        const from_utc = isoUtcNowPlus4hours();
+        const to_utc = isoUtcPlusDays(6);
 
         const resp = await apiGet<{ slots: Slot[] }>(
           "/api/v1/calendly",
@@ -198,8 +198,6 @@ export function App() {
           bearerToken
         );
 
-        console.log("Fetched slots:", resp.slots);
-
         const realSlots = resp.slots ?? [];
 
         if (realSlots.length === 0) {
@@ -209,7 +207,7 @@ export function App() {
 
         setSlots(realSlots);
       } catch (e: any) {
-        setError(e?.message ?? "Ошибка загрузки слотов");
+        setError(e?.message ?? "Помилка завантаження слотів");
         setSlots(buildMockSlots(14));
       } finally {
         setLoading(false);
@@ -486,10 +484,6 @@ export function App() {
                   </a>
                 </div>
               )}
-              <div className="small" style={{ marginTop: 8 }}>
-                Якщо бекенд повертає <code>payment_url</code> — ми одразу
-                редіректимо на оплату.
-              </div>
             </div>
           )}
         </div>
